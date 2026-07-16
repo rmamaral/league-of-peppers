@@ -4,9 +4,9 @@
 
 ### 👉 [**league-of-peppers.com**](https://league-of-peppers.com)
 
-![League of Peppers — off-meta League of Legends pick generator](./og-image.png)
+![League of Peppers: off-meta League of Legends pick generator](./og-image.png)
 
-Hit a button and get an instant recommendation — an off-meta (*"spicy"*) or classic
+Hit a button and get an instant recommendation: an off-meta (*"spicy"*) or classic
 solo pick, a synergized bot-lane duo, or a full five-champion team comp. Every roll
 comes with a suggested item build, a rune page, a skill-max order, and a clear **win
 condition**, so you know not just *what* to pick but *how* to play it.
@@ -17,7 +17,7 @@ condition**, so you know not just *what* to pick but *how* to play it.
 
 | Mode | What you get |
 |------|--------------|
-| 🎲 **Solo Pick** | 150+ curated picks, 15+ per role, in two flavors: **Classic meta** and **🌶️ Spicy (off-meta)** — each with a build, runes, and skill order. |
+| 🎲 **Solo Pick** | 150+ curated picks, 15+ per role, in two flavors: **Classic meta** and **🌶️ Spicy (off-meta)**, each with a build, runes, and skill order. |
 | 👯 **Bot Lane Duo** | Synergized ADC + support pairs (classic and off-meta) with the reason the lane works. |
 | 🏆 **Full Comp** | 15 complete team comps with an overview, power spike, win condition, how-to-play steps, and what counters them. |
 | 🧠 **Team Analyzer** | Pick five champions and get an archetype, damage profile, and a game plan. |
@@ -30,20 +30,20 @@ tooltips on hover.
 
 There are **two layers**:
 
-- **Live data** — champion art, items, and runes come straight from Riot's
+- **Live data**, champion art, items, and runes come straight from Riot's
   [Data Dragon](https://developer.riotgames.com/docs/lol), so builds always reflect the
   **current patch** with zero manual updates.
-- **Curated data** — which picks are spicy, which duos synergize, what to build, and why
+- **Curated data**, which picks are spicy, which duos synergize, what to build, and why
   all live hand-written in [`data.js`](./data.js). That judgment is the moat.
 
 An on-load validator checks every curated champion id, item name, and rune against the
-live Data Dragon data and logs any drift to the browser console — so when a patch renames
+live Data Dragon data and logs any drift to the browser console. So when a patch renames
 an item, you know immediately. See [`MAINTENANCE.md`](./MAINTENANCE.md) for the full
 data-editing guide.
 
 ## Tech
 
-Pure static site — **no framework, no build step, no backend.** Just vanilla HTML, CSS,
+Pure static site: **no framework, no build step, no backend.** Just vanilla HTML, CSS,
 and JavaScript that fetches from Data Dragon at runtime.
 
 ```
@@ -69,7 +69,7 @@ python3 -m http.server 8000
 npx serve .
 ```
 
-Then open <http://localhost:8000>. (An internet connection is required — the app fetches
+Then open <http://localhost:8000>. (An internet connection is required; the app fetches
 champion and item data live from Data Dragon.)
 
 ## Disclaimer

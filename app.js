@@ -7,7 +7,6 @@ let VERSION = '15.1.1';          // fallback if the version fetch fails
 let CHAMPS = {};                 // ddragon id -> { name, ... }
 let ITEMS = {};                  // normalized name -> { id, image, name }
 let currentMode = 'solo';
-let lastText = '';               // for the Copy button
 let RUNE_ICONS = {};             // normalized rune/style name -> icon URL
 let RUNE_DESC = {};              // normalized rune name -> shortDesc (ddragon)
 let RUNE_STYLES = new Set();     // style (tree) display names
@@ -260,7 +259,7 @@ function compBuilds(champs, label) {
   }).join('');
   if (!rows) return '';
   return `<div class="comp-section">
-      <span class="label">${label || '📦 Suggested builds'}</span>
+      <span class="label">${label || 'Suggested builds'}</span>
       <div class="cbuild">${rows}</div>
     </div>`;
 }
@@ -283,10 +282,10 @@ function lockFilter(base, ids) {
 }
 
 function lockHint(base, ids) {
-  if (!locks.size) return `<p class="lock-hint">Tap a champion to 🔒 lock it — rerolls keep it.</p>`;
+  if (!locks.size) return `<p class="lock-hint">Tap a champion to lock it — rerolls keep it.</p>`;
   const n = lockFilter(base, ids).length;
   const names = [...locks].map(champName).join(', ');
-  return `<p class="lock-hint is-on">🔒 ${names} locked — ${n === 1 ? 'this is the only curated roll' : `${n} curated rolls`} with that lock.</p>`;
+  return `<p class="lock-hint is-on">${names} locked — ${n === 1 ? 'this is the only curated roll' : `${n} curated rolls`} with that lock.</p>`;
 }
 
 // Make the rendered champs lock-toggleable (duo + comp cards).
@@ -314,7 +313,6 @@ function afterRoll(mode, entry, spicy = false) {
   currentRoll = { mode, entry, spicy };
   updateHash(currentRoll);
   pushHistory(currentRoll);
-  $('#copy').hidden = false;
   $('#share').hidden = false;
 }
 
@@ -360,7 +358,7 @@ function renderHistory() {
     let faces, title;
     if (h.mode === 'solo') { faces = portrait(h.entry.id, true); title = `${champName(h.entry.id)} ${h.entry.role}`; }
     else if (h.mode === 'duo') { faces = portrait(h.entry.adc, true) + portrait(h.entry.sup, true); title = `${champName(h.entry.adc)} + ${champName(h.entry.sup)}`; }
-    else { faces = `<span class="hist-emoji">${h.entry.emoji}</span>`; title = h.entry.name; }
+    else { faces = `<span class="hist-name">${h.entry.name}</span>`; title = h.entry.name; }
     const cur = currentRoll && h.entry === currentRoll.entry ? ' is-current' : '';
     return `<button class="hist-card${cur}" data-h="${i}" title="${title}">${faces}<span class="hist-name">${title}</span></button>`;
   }).join('');
@@ -395,8 +393,6 @@ function renderSolo(entry) {
   // Classic picks have no inline build — resolve from the shared libraries.
   const build = p.build || buildFor(p.id);
   const rune = runeFor(p.id, p.build);
-  lastText = `${spicy ? '🌶️' : '🎲'} ${champName(p.id)} ${p.role} — ${p.why}` +
-    (build ? `  ·  Build: ${build.path.join(' › ')}` : '');
   $('#result').innerHTML = `
     <div class="card">
       <span class="badge">${spicy ? '🌶️ ' : ''}${p.role}</span>
@@ -422,14 +418,13 @@ function renderDuo(entry) {
   }
   const adcBuild = d.builds?.adc || BUILDS[d.adc];
   const supBuild = d.builds?.sup || BUILDS[d.sup];
-  lastText = `${spicy ? '🌶️' : '👯'} ${champName(d.adc)} + ${champName(d.sup)} [${d.tag}] — ${d.why}`;
   $('#result').innerHTML = `
     <div class="card">
       <span class="badge">${spicy ? '🌶️ ' : ''}${d.tag}</span>
       <div class="duo-row">
-        <div ${lockable(d.adc)}>${portrait(d.adc)}<span class="champ-name">${champName(d.adc)}</span><span class="role-label">ADC</span><span class="lock-pip">🔒</span></div>
+        <div ${lockable(d.adc)}>${portrait(d.adc)}<span class="champ-name">${champName(d.adc)}</span><span class="role-label">ADC</span></div>
         <span class="duo-x">+</span>
-        <div ${lockable(d.sup)}>${portrait(d.sup)}<span class="champ-name">${champName(d.sup)}</span><span class="role-label">Support</span><span class="lock-pip">🔒</span></div>
+        <div ${lockable(d.sup)}>${portrait(d.sup)}<span class="champ-name">${champName(d.sup)}</span><span class="role-label">Support</span></div>
       </div>
       <p class="why">${d.why}</p>
       <div class="duo-builds">
@@ -446,22 +441,21 @@ function renderComp(entry) {
   const c = entry || pickNew(lockFilter(COMPS, (e) => e.champs.map((x) => x.id)));
   const champs = [...c.champs].sort((a, b) => ROLE_ORDER[a.role] - ROLE_ORDER[b.role]);
   const roster = champs.map((x) =>
-    `<div ${lockable(x.id)}>${portrait(x.id, true)}<span class="champ-name sm">${champName(x.id)}</span><span class="role-label">${x.role}</span><span class="lock-pip">🔒</span></div>`
+    `<div ${lockable(x.id)}>${portrait(x.id, true)}<span class="champ-name sm">${champName(x.id)}</span><span class="role-label">${x.role}</span></div>`
   ).join('');
   const steps = (c.play || []).map((s) => `<li>${s}</li>`).join('');
-  lastText = `${c.emoji} ${c.name}: ${champs.map((x) => champName(x.id)).join(', ')} — Win: ${c.winCon}`;
   $('#result').innerHTML = `
     <div class="card comp-card">
-      <h2 class="comp-title">${c.emoji} ${c.name}</h2>
+      <h2 class="comp-title">${c.name}</h2>
       ${c.spike ? `<span class="badge">Power spike · ${c.spike}</span>` : ''}
       <div class="comp-row">${roster}</div>
       ${c.overview ? `<p class="comp-overview">${c.overview}</p>` : ''}
       <div class="comp-section">
-        <span class="label label--win">🏆 Win condition</span>
+        <span class="label label--win">Win condition</span>
         <p>${c.winCon}</p>
       </div>
       ${steps ? `<div class="comp-section">
-        <span class="label">🎮 How to play</span>
+        <span class="label">How to play</span>
         <ul class="play-list">${steps}</ul>
       </div>` : ''}
       ${c.weakness ? `<div class="comp-section">
@@ -543,10 +537,9 @@ function renderPlan(list) {
   ).join('');
   const steps = a.archetype.play.map((s) => `<li>${s}</li>`).join('');
   const notes = a.notes.map((n) => `<li>${n}</li>`).join('');
-  lastText = `${a.archetype.emoji} ${a.archetype.key} (${ordered.map((x) => `${champName(x.id)} ${x.role}`).join(', ')}) — Win: ${a.archetype.winCon}`;
   $('#result').innerHTML = `
     <div class="card comp-card">
-      <h2 class="comp-title">${a.archetype.emoji} ${a.archetype.key}</h2>
+      <h2 class="comp-title">${a.archetype.key}</h2>
       <span class="badge">Power spike · ${a.spike}</span>
       <div class="comp-row">${roster}</div>
       <div class="team-check">
@@ -556,11 +549,11 @@ function renderPlan(list) {
         <span class="tc"><b>${a.engage ? 'Yes' : 'No'}</b><i>engage</i></span>
       </div>
       <div class="comp-section">
-        <span class="label label--win">🏆 Win condition</span>
+        <span class="label label--win">Win condition</span>
         <p>${a.archetype.winCon}</p>
       </div>
       <div class="comp-section">
-        <span class="label">🎮 How to play</span>
+        <span class="label">How to play</span>
         <ul class="play-list">${steps}</ul>
       </div>
       <div class="comp-section">
@@ -569,7 +562,6 @@ function renderPlan(list) {
       </div>
       ${compBuilds(ordered)}
     </div>`;
-  $('#copy').hidden = false;
 }
 
 // Build a champion grid into `grid`, calling onClick(id) on each pick.
@@ -639,7 +631,6 @@ function roll() {
   if (currentMode === 'solo') renderSolo();
   else if (currentMode === 'duo') renderDuo();
   else renderComp();
-  $('#copy').hidden = false;
 }
 
 /* ---- Draft Simulator ------------------------------------------------------ */
@@ -741,9 +732,9 @@ function renderDraft() {
   const step = DRAFT_ORDER[draftStep];
   const status = $('#draft-status');
   if (done) {
-    status.innerHTML = `<span class="done">✅ Draft complete</span>`;
+    status.innerHTML = `<span class="done">Draft complete</span>`;
   } else {
-    const team = step.t === 'B' ? '🔵 Blue' : '🔴 Red';
+    const team = step.t === 'B' ? 'Blue' : 'Red';
     status.innerHTML = `<span class="turn ${step.t === 'B' ? 'blue' : 'red'}">${team}</span> to <b>${step.k === 'ban' ? 'ban' : 'pick'}</b>`;
   }
   $('#blue-picks').innerHTML = pickSlots(dBlue, 'B', step, done);
@@ -765,7 +756,7 @@ function renderDraft() {
     renderDraftResult(sug);
   } else {
     const list = draftSuggest();
-    sug.innerHTML = `<div class="suggest-head">${step.k === 'ban' ? '🚫 Suggested bans' : '💡 Suggested picks'}</div>
+    sug.innerHTML = `<div class="suggest-head">${step.k === 'ban' ? 'Suggested bans' : 'Suggested picks'}</div>
       <div class="suggest-row">${list.map((s) =>
         `<button class="suggest-card" data-id="${s.id}">
            <img src="${DDRAGON}/cdn/${VERSION}/img/champion/${s.id}.png" alt="${champName(s.id)}" />
@@ -812,11 +803,11 @@ function evaluateTeam(ids, enemyIds) {
 function teamEvalCard(side, ev) {
   const a = ev.plan;
   return `<div class="eval-card ${side === 'Blue' ? 'blue' : 'red'}">
-      <div class="ec-head"><span class="ec-side">${side === 'Blue' ? '🔵 Blue' : '🔴 Red'}</span><span class="ec-score">${ev.score}<i>/100</i></span></div>
-      <div class="ec-arch">${a.archetype.emoji} ${a.archetype.key} · ${a.spike}</div>
+      <div class="ec-head"><span class="ec-side">${side === 'Blue' ? 'Blue' : 'Red'}</span><span class="ec-score">${ev.score}<i>/100</i></span></div>
+      <div class="ec-arch">${a.archetype.key} · ${a.spike}</div>
       <div class="ec-diag">${a.dmgLabel} · ${a.frontline} front · ${a.hardCC} CC · ${a.engage ? 'engage' : 'no engage'}</div>
-      <div class="ec-sec"><b>🏆 Win:</b> ${a.archetype.winCon}</div>
-      <div class="ec-sec"><b>🎮 Plan:</b><ul>${a.archetype.play.map((p) => `<li>${p}</li>`).join('')}</ul></div>
+      <div class="ec-sec"><b>Win:</b> ${a.archetype.winCon}</div>
+      <div class="ec-sec"><b>Plan:</b><ul>${a.archetype.play.map((p) => `<li>${p}</li>`).join('')}</ul></div>
       ${ev.strengths.length ? `<div class="ec-tags good">＋ ${ev.strengths.slice(0, 3).join(', ')}</div>` : ''}
       ${ev.weaknesses.length ? `<div class="ec-tags bad">－ ${ev.weaknesses.slice(0, 3).join(', ')}</div>` : ''}
     </div>`;
@@ -828,7 +819,7 @@ function renderDraftResult(el) {
   const diff = Math.abs(eB.score - eR.score);
   let banner;
   if (diff === 0) {
-    banner = `<div class="verdict">🤝 A <b>dead-even</b> draft <span class="v-score">${eB.score}–${eR.score}</span>
+    banner = `<div class="verdict">A <b>dead-even</b> draft <span class="v-score">${eB.score}–${eR.score}</span>
       <div class="v-reason">Both comps are equally balanced — this one comes down to play.</div></div>`;
   } else {
     const winner = eB.score > eR.score ? 'Blue' : 'Red';
@@ -841,7 +832,7 @@ function renderDraftResult(el) {
       ? `${loser} has ${loseEv.weaknesses[0]}`
       : edge ? `${winner} brings ${edge}` : `${winner} is the better-rounded composition`;
     banner = `<div class="verdict ${winner === 'Blue' ? 'blue' : 'red'}">
-        🏆 <b>${winner}</b> wins the draft ${margin}
+        <b>${winner}</b> wins the draft ${margin}
         <span class="v-score">${eB.score}–${eR.score}</span>
         <div class="v-reason">${reason}.</div></div>`;
   }
@@ -854,11 +845,11 @@ function renderDraftResult(el) {
         ${teamEvalCard('Red', eR)}
       </div>
       <div class="result-builds">
-        ${compBuilds(assignRoles(dBlue), '🔵 Blue — builds & skills')}
-        ${compBuilds(assignRoles(dRed), '🔴 Red — builds & skills')}
+        ${compBuilds(assignRoles(dBlue), 'Blue: builds & skills')}
+        ${compBuilds(assignRoles(dRed), 'Red: builds & skills')}
       </div>
       <div class="result-actions">
-        <button id="draft-save" class="btn-primary">💾 Save draft</button>
+        <button id="draft-save" class="btn-primary">Save draft</button>
         <button id="draft-new" class="btn-ghost">↺ New draft</button>
       </div>
       <p class="picker-hint">Saved drafts are stored in this browser only.</p>
@@ -891,9 +882,9 @@ function renderSaved() {
   const drafts = savedDrafts();
   if (!drafts.length) { el.innerHTML = ''; return; }
   const icons = (ids) => ids.map((id) => `<img src="${DDRAGON}/cdn/${VERSION}/img/champion/${id}.png" title="${champName(id)}" alt="${champName(id)}" />`).join('');
-  el.innerHTML = `<div class="saved-head">💾 Saved drafts (${drafts.length})</div>` +
+  el.innerHTML = `<div class="saved-head">Saved drafts (${drafts.length})</div>` +
     drafts.map((d) => `<div class="saved-row">
-        <span class="sv-win ${d.winner === 'Blue' ? 'blue' : 'red'}">🏆 ${d.winner} ${d.score || ''}</span>
+        <span class="sv-win ${d.winner === 'Blue' ? 'blue' : 'red'}">${d.winner} ${d.score || ''}</span>
         <span class="sv-teams">${icons(d.blue)}<b class="sv-vs">vs</b>${icons(d.red)}</span>
         <button class="sv-load" data-id="${d.id}">Load</button>
         <button class="sv-del" data-id="${d.id}" title="Delete">✕</button>
@@ -925,7 +916,6 @@ function setMode(mode, { fresh = true } = {}) {
   if (isAnalyzer) {
     buildChampGrid();
     syncPicker();
-    $('#copy').hidden = true;
     $('#share').hidden = true;
     $('#result').innerHTML = `<p class="hint">Pick your champions, then generate a game plan.</p>`;
   } else if (isDraft) {
@@ -948,7 +938,7 @@ $('#share').addEventListener('click', async () => {
     await navigator.clipboard.writeText(location.href);
     const btn = $('#share');
     const label = btn.textContent;
-    btn.textContent = '✅ Link copied';
+    btn.textContent = 'Link copied';
     setTimeout(() => (btn.textContent = label), 1400);
   } catch { /* clipboard blocked — no-op */ }
 });
@@ -966,15 +956,5 @@ $('#draft-search').addEventListener('input', (e) => {
   });
 });
 $('#draft-reset').addEventListener('click', draftReset);
-
-$('#copy').addEventListener('click', async () => {
-  try {
-    await navigator.clipboard.writeText(lastText + '  ·  leagueofbot');
-    const btn = $('#copy');
-    const label = btn.textContent;
-    btn.textContent = '✅ Copied';
-    setTimeout(() => (btn.textContent = label), 1400);
-  } catch { /* clipboard blocked — no-op */ }
-});
 
 boot();
