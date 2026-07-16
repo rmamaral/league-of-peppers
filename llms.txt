@@ -1,0 +1,23 @@
+# League of Peppers
+
+> A free League of Legends champion pick generator. It rolls off-meta ("spicy") and classic-meta solo picks, bot-lane duos, and full 5-man team comps — each with a suggested item build, a rune page, a skill-max order, and a clear win condition. Champion, item, and rune data updates live with every Riot patch via Data Dragon (reviewed patch 16.14).
+
+## What it does
+
+- **Solo Pick generator** — 151 curated champion picks, 15+ for every role (Top, Jungle, Mid, Bot, Support), in two flavors: off-meta ("spicy", e.g. AP Kog'Maw mid, artillery Ziggs bot) and classic meta. Each pick includes an item build, runes, and skill order.
+- **Bot-Lane Duo generator** — 35 synergized ADC + support pairs, classic and off-meta, each with the reason the lane works.
+- **Team Comp generator** — 15 full 5-champion comps (Poke & Siege, Wombo Dive, Protect the Carry, Split Push, and more), each with an overview, power spike, win condition, how-to-play steps, and what counters it.
+- **Team Analyzer** — pick five champions and get an archetype, damage profile, and a game plan.
+- **Draft Simulator** — a tournament-draft board with pick/ban suggestions.
+
+## Key facts
+
+- Free, no sign-up, runs in any web browser.
+- Not affiliated with or endorsed by Riot Games.
+- Builds and champion art are always current-patch (live from Riot Data Dragon).
+- Item and rune icons show full in-game descriptions on hover.
+
+## Pages
+
+- [Home / interactive generator](https://league-of-peppers.com/)
+- [Full pick list (plain text)](https://league-of-peppers.com/picks.html): every curated pick, duo, and comp with builds and runes.

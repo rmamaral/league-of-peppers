@@ -1,0 +1,25 @@
+# macOS / editor junk
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Deployment-specific verification tokens (each deploy generates its own).
+# .indexnow-key = local note of the key filename.
+# [0-9a-f]*.txt = the IndexNow key file, e.g. e5512bca….txt (keep it out of git).
+# google*.html = Google Search Console verification file.
+.indexnow-key
+[0-9a-f]*.txt
+google*.html
+
+# The 909KB favicon.png the site does not use (the favicon is an inline SVG in index.html).
+favicon.png
