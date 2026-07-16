@@ -107,7 +107,7 @@ body {
   box-shadow: 0 4px 14px rgba(200,170,110,.25);
 }
 
-main { width: 100%; max-width: 640px; display: flex; flex-direction: column; align-items: center; }
+main { width: 100%; max-width: 800px; display: flex; flex-direction: column; align-items: center; }
 
 /* Controls */
 .controls { margin-bottom: 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -541,7 +541,7 @@ main { width: 100%; max-width: 640px; display: flex; flex-direction: column; ali
 /* Recent rolls strip */
 .history {
   margin-top: 18px;
-  width: 100%; max-width: 720px;
+  width: 100%; max-width: 800px;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
 .history[hidden] { display: none; }
@@ -624,7 +624,7 @@ main { width: 100%; max-width: 640px; display: flex; flex-direction: column; ali
 
 .about {
   width: 100%;
-  max-width: 720px;
+  max-width: 800px;
   margin: 48px auto 0;
   padding: 28px 24px;
   background: var(--bg-panel);

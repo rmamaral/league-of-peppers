@@ -298,6 +298,7 @@ const DUOS = [
    champions OUT of their conventional role, so the shared BUILDS entry would be
    wrong. builds.adc / builds.sup (when present) win over BUILDS[id]. */
 const SPICY_DUOS = [
+  // --- Kept from the original list (all pass the off-role test) --------------
   { adc: 'Yasuo', sup: 'Malphite', tag: 'Knock-Up', why: 'Malphite ult is the world’s largest Yasuo ult button. Unstoppable force, meet windwall.',
     builds: { sup: { rune: 'Arcane Comet · Inspiration', skill: 'Q → E → W', path: ["World Atlas","Sorcerer's Shoes","Rod of Ages","Rabadon's Deathcap","Zhonya's Hourglass","Void Staff"] } } },
   { adc: 'Ziggs', sup: 'Heimerdinger', tag: 'Siege', why: 'Two demolition experts, one lane. The tower is gone by 14 minutes and so is their will to play.',
@@ -306,15 +307,73 @@ const SPICY_DUOS = [
     builds: { sup: { rune: 'Aftershock · Inspiration', skill: 'Q → W → E', path: ["World Atlas","Plated Steelcaps","Locket of the Iron Solari","Knight's Vow","Zeke's Convergence","Thornmail"] } } },
   { adc: 'Karthus', sup: 'Sona', tag: 'Press R', why: 'Farm with a screen-wide death aura, then both of you press R and someone across the map dies.',
     builds: { adc: { rune: 'Dark Harvest · Sorcery', skill: 'Q → E → W', path: ["Doran's Ring","Sorcerer's Shoes","Liandry's Torment","Rabadon's Deathcap","Zhonya's Hourglass","Void Staff"] } } },
-  { adc: 'Brand', sup: 'Zyra', tag: 'Double Mage', why: 'No ADC, only fire and plants. Their support facechecks one brush and the lane is over.',
-    builds: { adc: { rune: 'Dark Harvest · Sorcery', skill: 'W → Q → E', path: ["Doran's Ring","Sorcerer's Shoes","Liandry's Torment","Rylai's Crystal Scepter","Rabadon's Deathcap","Void Staff"] } } },
   { adc: 'Samira', sup: 'Sett', tag: 'Brawl', why: 'Sett flings them into the blender and face-tanks the counter-engage. Style points mandatory.',
     builds: { sup: { rune: 'Aftershock · Precision', skill: 'W → E → Q', path: ["World Atlas","Plated Steelcaps","Locket of the Iron Solari","Sterak's Gage","Sunfire Aegis","Thornmail"] } } },
-  { adc: 'Seraphine', sup: 'Swain', tag: 'Drain', why: 'Two drain-scaling AP engines in one lane. Every extended trade heals you and kills them.',
-    builds: { adc: { rune: 'Summon Aery · Inspiration', skill: 'Q → E → W', path: ["Doran's Ring","Sorcerer's Shoes","Liandry's Torment","Rabadon's Deathcap","Ardent Censer","Void Staff"] },
-              sup: { rune: 'Arcane Comet · Inspiration', skill: 'E → W → Q', path: ["World Atlas","Sorcerer's Shoes","Liandry's Torment","Rylai's Crystal Scepter","Zhonya's Hourglass","Rabadon's Deathcap"] } } },
   { adc: 'Veigar', sup: 'Lulu', tag: 'Scaling Cage', why: 'Lulu keeps the tiny devil alive while the AP stacks tick toward one-shot territory.',
     builds: { adc: { rune: 'Arcane Comet · Inspiration', skill: 'Q → E → W', path: ["Doran's Ring","Sorcerer's Shoes","Rod of Ages","Rabadon's Deathcap","Zhonya's Hourglass","Void Staff"] } } },
+
+  // --- Knock-up / dash chains -----------------------------------------------
+  { adc: 'Yasuo', sup: 'Alistar', tag: 'Knock-Up', why: 'Headbutt-pulverize is two knock-ups on a 6-second cooldown. Yasuo ults twice a fight.',
+    builds: {} },
+  { adc: 'Yone', sup: 'Gragas', tag: 'Knock-Up', why: 'Barrel them into the air, Yone ults through the whole lane. Cask disengage covers the reset.',
+    builds: {} },
+  { adc: 'Yasuo', sup: 'Nautilus', tag: 'Knock-Up', why: 'Hook, ult, knock-up chain. Yasuo just has to walk forward and press R.',
+    builds: {} },
+
+  // --- Double AP / no-ADC lanes ---------------------------------------------
+  { adc: 'Swain', sup: 'Yuumi', tag: 'Battery', why: 'An untargetable cat feeding an unkillable bird. Swain drains the lane and never runs out of mana.',
+    builds: { adc: { rune: 'Conqueror · Inspiration', skill: 'W → Q → E', path: ["Doran's Ring","Sorcerer's Shoes","Riftmaker","Rylai's Crystal Scepter","Rabadon's Deathcap","Zhonya's Hourglass"] } } },
+  { adc: 'Cassiopeia', sup: 'Nami', tag: 'Poison', why: 'Nami bubbles them into a puddle of poison. No boots needed when they cannot walk away.',
+    builds: { adc: { rune: 'Conqueror · Inspiration', skill: 'E → Q → W', path: ["Doran's Ring","Luden's Echo","Rylai's Crystal Scepter","Rabadon's Deathcap","Void Staff","Zhonya's Hourglass"] } } },
+  { adc: 'Vladimir', sup: 'Milio', tag: 'Drain', why: 'Milio extends the pool range and cleanses the CC. Vlad simply refuses to die and out-scales everyone.',
+    builds: { adc: { rune: 'Conqueror · Inspiration', skill: 'Q → E → W', path: ["Doran's Ring","Sorcerer's Shoes","Riftmaker","Rabadon's Deathcap","Zhonya's Hourglass","Void Staff"] } } },
+  { adc: 'Syndra', sup: 'Zilean', tag: 'Stun Lock', why: 'Double bomb stun into a full sphere combo. If it does not kill them, the revive means you try again.',
+    builds: { adc: { rune: 'Electrocute · Inspiration', skill: 'Q → W → E', path: ["Doran's Ring","Sorcerer's Shoes","Luden's Echo","Rabadon's Deathcap","Shadowflame","Void Staff"] } } },
+  { adc: 'Neeko', sup: 'Shaco', tag: 'Trickery', why: 'A clone and a box in the same bush. Their support has no idea what is real and dies to both.',
+    builds: { adc: { rune: 'Electrocute · Domination', skill: 'Q → E → W', path: ["Doran's Ring","Sorcerer's Shoes","Luden's Echo","Rabadon's Deathcap","Shadowflame","Zhonya's Hourglass"] },
+              sup: { rune: 'Electrocute · Domination', skill: 'E → Q → W', path: ["World Atlas","Mercury's Treads","Umbral Glaive","Youmuu's Ghostblade","Edge of Night","Profane Hydra"] } } },
+
+  // --- Melee carries with a real support ------------------------------------
+  { adc: 'Mordekaiser', sup: 'Lulu', tag: 'Isolate', why: 'Lulu turns the ult 1v1 into a guaranteed win. Their carry leaves the map and does not come back.',
+    builds: { adc: { rune: 'Conqueror · Precision', skill: 'Q → E → W', path: ["Doran's Ring","Sorcerer's Shoes","Riftmaker","Rylai's Crystal Scepter","Rabadon's Deathcap","Spirit Visage"] } } },
+  { adc: 'Fiora', sup: 'Braum', tag: 'Duel', why: 'Braum walls the poke and stuns for the parry window. Fiora vitals melt anything that stands still.',
+    builds: { adc: { rune: 'Conqueror · Resolve', skill: 'Q → E → W', path: ["Doran's Blade","Plated Steelcaps","Blade of the Ruined King","Trinity Force","Sterak's Gage","Death's Dance"] } } },
+  { adc: 'Nasus', sup: 'Thresh', tag: 'Stacks', why: 'Thresh lantern makes the greedy Q stack free. By 25 minutes the dog one-shots their whole team.',
+    builds: { adc: { rune: 'Conqueror · Resolve', skill: 'Q → W → E', path: ["Doran's Shield","Plated Steelcaps","Iceborn Gauntlet","Sunfire Aegis","Spirit Visage","Thornmail"] } } },
+  { adc: 'Garen', sup: 'Leona', tag: 'Lockdown', why: 'Leona chains them in place for the full spin, then the execute. No dashes, no outplay, just damage.',
+    builds: { adc: { rune: 'Conqueror · Precision', skill: 'Q → E → W', path: ["Doran's Blade","Plated Steelcaps","Trinity Force","Black Cleaver","Sterak's Gage","Death's Dance"] } } },
+  { adc: 'Pyke', sup: 'Blitzcrank', tag: 'Hook City', why: 'Two hooks in one lane. If either lands, the execute resets and you both leave with gold.',
+    builds: { adc: { rune: 'Electrocute · Domination', skill: 'Q → E → W', path: ["Doran's Blade","Mercury's Treads","Youmuu's Ghostblade","Umbral Glaive","Edge of Night","Profane Hydra"] } } },
+
+  // --- Poke / siege ----------------------------------------------------------
+  { adc: 'Xerath', sup: 'Zilean', tag: 'Artillery', why: 'Speed boost into max-range artillery. They cannot reach you and they cannot out-range you.',
+    builds: { adc: { rune: 'Arcane Comet · Inspiration', skill: 'Q → W → E', path: ["Doran's Ring","Sorcerer's Shoes","Luden's Echo","Rabadon's Deathcap","Shadowflame","Void Staff"] } } },
+  { adc: 'Jayce', sup: 'Karma', tag: 'Poke', why: 'Empowered mantra on a cannon shot. The lane is a no-walk zone from level 3 onward.',
+    builds: { adc: { rune: 'Press the Attack · Domination', skill: 'Q → E → W', path: ["Doran's Blade","Plated Steelcaps","Eclipse","Youmuu's Ghostblade","Serylda's Grudge","Death's Dance"] } } },
+  { adc: 'Varus', sup: 'Ashe', tag: 'Arrows', why: 'Two long-range engage ults from the bot lane. Someone gets chain-CCd across the screen every fight.',
+    builds: { sup: { rune: 'Lethal Tempo · Inspiration', skill: 'W → Q → E', path: ["World Atlas","Berserker's Greaves","Imperial Mandate","Rapid Firecannon","Runaan's Hurricane","Wit's End"] } } },
+  { adc: 'Ziggs', sup: 'Zilean', tag: 'Demolition', why: 'Speed to dodge the gank, bombs to take the tower. The plate gold is yours by 10 minutes.',
+    builds: {} },
+
+  // --- Enchanter / hypercarry oddities --------------------------------------
+  { adc: 'KogMaw', sup: 'Nami', tag: 'Hyper', why: 'AP Kog with a bubble and empowered autos. Anything that walks into range simply evaporates.',
+    builds: { adc: { rune: 'Fleet Footwork · Sorcery', skill: 'W → Q → E', path: ["Doran's Ring","Sorcerer's Shoes","Nashor's Tooth","Riftmaker","Rabadon's Deathcap","Void Staff"] } } },
+  { adc: 'Kayle', sup: 'Soraka', tag: 'Scaling', why: 'Two people who lose lane and win the game. Survive to 11 and the lane never dies again.',
+    builds: { adc: { rune: 'Lethal Tempo · Inspiration', skill: 'Q → E → W', path: ["Doran's Ring","Berserker's Greaves","Nashor's Tooth","Rabadon's Deathcap","Guinsoo's Rageblade","Rylai's Crystal Scepter"] } } },
+  { adc: 'Twitch', sup: 'Yuumi', tag: 'Ambush', why: 'An invisible rat with an attached cat. Walk into their jungle, delete someone, walk out.',
+    builds: {} },
+  { adc: 'Tristana', sup: 'Zilean', tag: 'Bomb Squad', why: 'AP Trist with a double bomb stun. Jump in, both bombs land, the ADC is a red mist.',
+    builds: { adc: { rune: 'Electrocute · Sorcery', skill: 'E → W → Q', path: ["Doran's Ring","Sorcerer's Shoes","Lich Bane","Nashor's Tooth","Rabadon's Deathcap","Zhonya's Hourglass"] } } },
+
+  // --- Tank / bruiser bot ----------------------------------------------------
+  { adc: 'Malphite', sup: 'Yuumi', tag: 'Rock Cat', why: 'An unkillable rock that farms to two items, then ults their whole team. The cat just watches.',
+    builds: { adc: { rune: 'Arcane Comet · Inspiration', skill: 'Q → E → W', path: ["Doran's Ring","Sorcerer's Shoes","Luden's Echo","Rabadon's Deathcap","Zhonya's Hourglass","Void Staff"] } } },
+  { adc: 'Sett', sup: 'Rakan', tag: 'Fling', why: 'Rakan engages, Sett flings the whole lane back into your team. Nobody walks away from this.',
+    builds: { adc: { rune: 'Conqueror · Resolve', skill: 'W → Q → E', path: ["Doran's Blade","Plated Steelcaps","Sterak's Gage","Sunfire Aegis","Spirit Visage","Death's Dance"] } } },
+  { adc: 'Urgot', sup: 'Leona', tag: 'Grinder', why: 'Leona locks them down for the leg day combo. The ult execute drags their carry through your team.',
+    builds: { adc: { rune: 'Conqueror · Resolve', skill: 'Q → W → E', path: ["Doran's Blade","Plated Steelcaps","Black Cleaver","Sterak's Gage","Death's Dance","Spirit Visage"] } } },
+  { adc: 'Gwen', sup: 'Braum', tag: 'Mist', why: 'Braum shields the poke while Gwen sits in the mist. Nothing ranged can touch her and melee dies.',
+    builds: { adc: { rune: 'Conqueror · Resolve', skill: 'Q → E → W', path: ["Doran's Ring","Berserker's Greaves","Nashor's Tooth","Riftmaker","Rabadon's Deathcap","Zhonya's Hourglass"] } } },
 ];
 
 // --- Mode 3: Full Team Comps (themed, with a full breakdown) -----------------
@@ -549,6 +608,8 @@ const BUILDS = {
   Blitzcrank:{ skill: 'Q → E → W', path: ["World Atlas","Mercury's Treads","Locket of the Iron Solari","Knight's Vow","Zeke's Convergence","Thornmail"] },
   Milio:    { skill: 'Q → E → W', path: ["World Atlas","Sorcerer's Shoes","Moonstone Renewer","Ardent Censer","Staff of Flowing Water","Redemption"] },
   Sona:     { skill: 'Q → E → W', path: ["World Atlas","Sorcerer's Shoes","Moonstone Renewer","Ardent Censer","Staff of Flowing Water","Echoes of Helia"] },
+  Zilean:   { skill: 'Q → E → W', path: ["World Atlas","Sorcerer's Shoes","Rod of Ages","Rylai's Crystal Scepter","Zhonya's Hourglass","Rabadon's Deathcap"] },
+  Taric:    { skill: 'Q → W → E', path: ["World Atlas","Plated Steelcaps","Locket of the Iron Solari","Knight's Vow","Zeke's Convergence","Thornmail"] },
   Soraka:   { skill: 'Q → E → W', path: ["World Atlas","Sorcerer's Shoes","Moonstone Renewer","Redemption","Staff of Flowing Water","Mikael's Blessing"] },
   Teemo:    { skill: 'E → Q → W', path: ["Doran's Ring","Sorcerer's Shoes","Nashor's Tooth","Liandry's Torment","Rylai's Crystal Scepter","Rabadon's Deathcap"] },
   Evelynn:  { skill: 'Q → E → W', path: ["Doran's Ring","Sorcerer's Shoes","Hextech Rocketbelt","Rabadon's Deathcap","Shadowflame","Zhonya's Hourglass"] },
@@ -601,6 +662,7 @@ const RUNES = {
   Braum: 'Guardian · Inspiration', Alistar: 'Aftershock · Inspiration',
   Blitzcrank: 'Aftershock · Inspiration', Milio: 'Summon Aery · Inspiration',
   Sona: 'Summon Aery · Inspiration', Soraka: 'Summon Aery · Inspiration',
+  Zilean: 'Arcane Comet · Inspiration', Taric: 'Aftershock · Inspiration',
   Janna: 'Summon Aery · Inspiration', Pyke: 'Hail of Blades · Inspiration',
   // Mids
   Xerath: 'Arcane Comet · Inspiration', Orianna: 'Arcane Comet · Inspiration',
