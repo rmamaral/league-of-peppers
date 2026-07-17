@@ -45,7 +45,11 @@ async function boot() {
   }
   $('#patch').textContent = VERSION;
   validateCuration();
+  syncPolling(); // loads the count now, and keeps it fresh while the tab is visible
   applyHash(); // restore a shared roll from the URL, if any
+  // applyHash() sets its own backdrop when restoring a shared roll; otherwise the
+  // page would open with no art at all, so seed one.
+  if (!currentRoll) setBackdrop(pick(SPICY).id);
 }
 
 /* ---- Data-update guardrail ------------------------------------------------ */
@@ -264,6 +268,151 @@ function compBuilds(champs, label) {
     </div>`;
 }
 
+/* ---- Champion splash backdrop --------------------------------------------- */
+/* Fades the rolled champion's splash art in behind the page. Splash URLs are not
+   version-scoped, unlike the portrait/item paths above.
+   Decorative only: if the image 404s or the network is slow, nothing happens and
+   the page keeps its plain background. */
+const splashUrl = (id) => `${DDRAGON}/cdn/img/champion/splash/${id}_0.jpg`;
+
+let backdropSlot = 'b';        // the layer currently hidden; next splash goes here
+let backdropToken = 0;         // guards against a slow load overwriting a newer roll
+const splashCache = new Set(); // ids we have already fetched once
+
+function setBackdrop(id) {
+  if (!id) return;
+  const layers = document.querySelectorAll('.backdrop-layer');
+  if (!layers.length) return;
+
+  const token = ++backdropToken;
+  const url = splashUrl(id);
+
+  const apply = () => {
+    // A newer roll landed while this image was loading — drop this one.
+    if (token !== backdropToken) return;
+    const next = document.querySelector(`.backdrop-layer[data-slot="${backdropSlot}"]`);
+    const prev = document.querySelector(`.backdrop-layer[data-slot="${backdropSlot === 'a' ? 'b' : 'a'}"]`);
+    next.style.backgroundImage = `url("${url}")`;
+    next.classList.add('is-on');
+    prev.classList.remove('is-on');
+    backdropSlot = backdropSlot === 'a' ? 'b' : 'a';
+  };
+
+  if (splashCache.has(id)) { apply(); return; }
+
+  // Decode before showing, so the cross-fade never reveals a half-painted image.
+  const img = new Image();
+  img.onload = () => { splashCache.add(id); apply(); };
+  img.onerror = () => { /* no splash for this id — leave the current backdrop */ };
+  img.src = url;
+}
+
+/* Which champion represents a roll: solo picks are obvious, duos/comps use the
+   first champion so the backdrop matches the leftmost portrait on screen. */
+function backdropIdFor(mode, entry) {
+  if (!entry) return null;
+  if (mode === 'solo') return entry.id;
+  if (mode === 'duo') return entry.adc;
+  if (mode === 'comp') return entry.champs?.[0]?.id;
+  return null;
+}
+
+/* ---- Global roll counter --------------------------------------------------- */
+/* Backed by a Cloudflare Worker + KV (see worker/README.md). Entirely optional:
+   if COUNTER_API is unset or the request fails, the counter stays hidden and
+   nothing else changes. The total is a vanity number — it is publicly writable,
+   so treat Cloudflare Web Analytics as the real traffic figure. */
+const COUNTER_API = 'https://lop-counter.league-of-peppers.workers.dev';
+
+/* 999 -> "999", 1000 -> "1k", 1240 -> "1.2k", 1000000 -> "1M", 12300000 -> "12.3M".
+   Keeps one decimal when it carries information, drops a bare ".0". Truncates
+   rather than rounds, so the number never claims a milestone it has not reached
+   — 999,999 shows 999.9k, not 1M. */
+function compactCount(n) {
+  const units = [[1e9, 'B'], [1e6, 'M'], [1e3, 'k']];
+  for (const [size, suffix] of units) {
+    if (n >= size) {
+      const v = Math.floor((n / size) * 10) / 10; // one decimal, truncated
+      return (Number.isInteger(v) ? String(v) : v.toFixed(1)) + suffix;
+    }
+  }
+  return String(n);
+}
+
+/* KV is eventually consistent, so a poll can return a total slightly older than
+   the one our own POST just returned. Ignore small backward steps so the number
+   never visibly ticks down — but accept a large drop, which means the counter was
+   genuinely reset rather than read stale. */
+const STALE_TOLERANCE = 50;
+let shownCount = -1;
+
+function showRollCount(total) {
+  if (!Number.isFinite(total)) return;
+  const isStaleRead = total < shownCount && total > shownCount - STALE_TOLERANCE;
+  if (isStaleRead) return;
+  shownCount = total;
+  const el = $('#roll-count');
+  const strong = el.querySelector('strong');
+  strong.textContent = compactCount(total);
+  // Full number on hover / for screen readers; the pill itself is abbreviated.
+  el.title = `${total.toLocaleString()} rolls`;
+  el.hidden = false;
+}
+
+async function loadRollCount() {
+  if (!COUNTER_API) return;
+  try {
+    const r = await fetch(`${COUNTER_API}/count`);
+    if (!r.ok) return;
+    showRollCount((await r.json()).total);
+  } catch { /* offline or worker down: leave the counter hidden */ }
+}
+
+/* Poll so other people's rolls show up live, but only while the tab is actually
+   being looked at — a backgrounded tab polling forever is pure waste (and burns
+   the Worker's free-tier request budget for an audience of nobody). */
+const POLL_MS = 15000;
+let pollTimer = null;
+
+function startPolling() {
+  if (!COUNTER_API || pollTimer) return;
+  pollTimer = setInterval(loadRollCount, POLL_MS);
+}
+
+function stopPolling() {
+  clearInterval(pollTimer);
+  pollTimer = null;
+}
+
+function syncPolling() {
+  if (document.visibilityState === 'visible') {
+    loadRollCount(); // catch up immediately on return, then resume the interval
+    startPolling();
+  } else {
+    stopPolling();
+  }
+}
+
+document.addEventListener('visibilitychange', syncPolling);
+
+/* Debounce so a double-click counts once. This is not abuse protection — the
+   endpoint is public and unauthenticated — it just keeps the number honest for
+   ordinary use. */
+const BUMP_MIN_GAP_MS = 1000;
+let lastBumpAt = 0;
+
+async function bumpRollCount() {
+  if (!COUNTER_API) return;
+  const now = Date.now();
+  if (now - lastBumpAt < BUMP_MIN_GAP_MS) return;
+  lastBumpAt = now;
+  try {
+    const r = await fetch(`${COUNTER_API}/count`, { method: 'POST' });
+    if (!r.ok) return;            // keep showing the last good number
+    showRollCount((await r.json()).total);
+  } catch { /* no-op: a roll must never fail because the counter did */ }
+}
+
 /* ---- Roll plumbing: locks, share links, history ---------------------------- */
 // Pick from a pool, avoiding an immediate repeat of what's on screen.
 function pickNew(pool) {
@@ -314,6 +463,8 @@ function afterRoll(mode, entry, spicy = false) {
   updateHash(currentRoll);
   pushHistory(currentRoll);
   $('#share').hidden = false;
+  setBackdrop(backdropIdFor(mode, entry));
+  bumpRollCount();
 }
 
 function updateHash(roll) {

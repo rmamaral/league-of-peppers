@@ -103,9 +103,22 @@
 <body>
  <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "28f0e18d486a4a4282c44350c4f4f774"}'></script><!-- End Cloudflare Web Analytics -->
 
+  <!-- Champion splash backdrop. Two layers so a new splash can cross-fade over
+       the old one instead of popping. Purely decorative: aria-hidden. -->
+  <div class="backdrop" aria-hidden="true">
+    <div class="backdrop-layer" data-slot="a"></div>
+    <div class="backdrop-layer" data-slot="b"></div>
+    <div class="backdrop-scrim"></div>
+    <div class="backdrop-grain"></div>
+  </div>
+
+  <p id="roll-count" class="roll-count" hidden aria-live="polite">
+    <strong></strong> <span>rolls</span>
+  </p>
+
   <header class="site-header">
     <h1 class="logo">League&nbsp;of&nbsp;Peppers</h1>
-    <p class="tagline">Roll something <em>cool</em>. Break the meta.</p>
+    <p class="tagline">Stop picking the same champs.</p>
     <p class="intro">A free <strong>League of Legends champion generator</strong>. Roll off-meta or classic picks, bot-lane duos, and full team comps, each with a build, runes, and a win condition.</p>
   </header>
 
@@ -205,20 +218,26 @@
   </main>
 
   <section class="about" aria-labelledby="about-h">
-    <h2 id="about-h">About the League of Legends pick generator</h2>
+    <h2 id="about-h">Why I made this League of Legends pick generator</h2>
     <p>
-      <strong>League of Peppers</strong> is a free <strong>League of Legends</strong> champion
-      generator for players who are bored of the same meta picks. Hit the button and get an
-      instant recommendation: an off-meta (<em>“spicy”</em>) or classic solo pick, a synergized
-      bot-lane duo, or a full five-champion team comp. Every roll comes with a suggested item
-      build, a rune page, a skill-max order, and a clear win condition, so you know not just
-      <em>what</em> to pick but <em>how</em> to play it.
+      I’ve played this game for years and kept picking the same champs out of habit.
+      So I built <strong>League of Peppers</strong>: a free <strong>League of Legends champion
+      generator</strong> that hands you something you wouldn’t have thought of. Hit the button
+      and you get an off-meta (<em>“spicy”</em>) or classic solo pick, a bot-lane duo, or a
+      full five-champion team comp.
     </p>
     <p>
-      Champion portraits, items, and runes are pulled live from Riot’s Data Dragon, so builds
-      always match the current League of Legends patch. There are 150+ curated picks, 15 or
-      more for every role (Top, Jungle, Mid, Bot, Support) in both spicy and classic flavors -
-      plus dozens of bot-lane duos and fifteen full team comps with a breakdown of how they win.
+      The part I care about is that it doesn’t just name a champion. Every roll comes with the
+      item build, rune page, skill-max order, and win condition that make the pick actually
+      work, because “just play AP Kog’Maw mid” is useless without the build. Every pick is
+      hand-written by me, not scraped from a win-rate table. If a pick is in here, it’s because
+      I think it’s worth playing.
+    </p>
+    <p>
+      Champion portraits, items, and runes come live from Riot’s Data Dragon, so builds always
+      match the current League of Legends patch. There are 150+ curated picks, 15 or more for
+      every role (Top, Jungle, Mid, Bot, Support) in both spicy and classic flavors, plus
+      dozens of bot-lane duos and fifteen full team comps with a breakdown of how they win.
     </p>
 
     <h3>Frequently asked questions</h3>
@@ -240,11 +259,16 @@
     </dl>
     <p class="about-more">Browse the <a href="/picks.html">full list of every pick, duo, and team comp</a>
       as a plain-text reference.</p>
+    <p class="signoff">
+      Made by Ricardo. Picks last reviewed on patch <strong>16.14</strong>.
+      Found a pick I’m missing, or one that’s gone stale?
+      <a href="https://github.com/rmamaral/league-of-peppers">Tell me on GitHub</a>.
+    </p>
   </section>
 
   <footer class="site-footer">
     <p>Champion art via Riot <a href="https://developer.riotgames.com/docs/lol" target="_blank" rel="noopener">Data Dragon</a>. Patch <span id="patch">…</span>.</p>
-    <p class="disclaimer">League of Peppers isn’t endorsed by Riot Games and doesn’t reflect their views. League of Legends © Riot Games, Inc.</p>
+    <p class="disclaimer">League of Peppers isn’t endorsed by Riot Games and doesn’t reflect their views.</p>
   </footer>
 
   <script src="data.js"></script>

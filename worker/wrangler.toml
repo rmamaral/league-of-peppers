@@ -1,0 +1,9 @@
+name = "lop-counter"
+main = "src/index.js"
+compatibility_date = "2026-07-01"
+
+# Created with:  npx wrangler kv namespace create COUNTER
+# Paste the printed id below (and preview_id if you use `wrangler dev --remote`).
+[[kv_namespaces]]
+binding = "COUNTER"
+id = "48cf67e8214f4121be362a810c0ea0a7"

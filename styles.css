@@ -33,6 +33,10 @@
 }
 
 * { box-sizing: border-box; }
+
+/* Base colour lives here so .backdrop can stay transparent and let the splash
+   layers show through. */
+html { background: var(--bg); }
 a {
   color: var(--link);
   text-decoration: underline;
@@ -54,40 +58,147 @@ body {
   min-height: 100vh;
   font-family: var(--font-body);
   color: var(--text);
-  background:
-    radial-gradient(900px 500px at 50% -10%, rgba(10,200,185,.10), transparent 60%),
-    var(--bg);
+  /* The off-centre glow now lives in .backdrop-scrim, which sits behind this. */
+  background: transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 0 16px 40px;
 }
 
-/* Header */
-.site-header { text-align: center; margin: 40px 0 8px; }
-.logo {
+/* Content sits above the fixed backdrop (which is z-index: 0). */
+.site-header,
+.tabs,
+main,
+.about,
+.site-footer,
+noscript {
+  position: relative;
+  z-index: 1;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0; 
+  pointer-events: none;
+  overflow: hidden;
+}
+.backdrop-layer {
+  position: absolute;
+  inset: -8%;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: blur(5px) saturate(.75);
+  opacity: 0;
+  transition: opacity .9s ease;
+  transform: scale(1.06);
+}
+.backdrop-layer.is-on { opacity: .8; }
+
+/* Darkens and cools the art so gold/teal text keeps its contrast, and keeps the
+   original off-centre glow so the header still has its light source. */
+.backdrop-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(760px 460px at 22% -8%, rgba(10,200,185,.10), transparent 62%),
+    linear-gradient(180deg, rgba(10,14,19,.72) 0%, rgba(10,14,19,.86) 55%, rgba(10,14,19,.94) 100%);
+}
+
+/* Film grain. One inline SVG turbulence, no request, no image file. Breaks up
+   the flat CSS-gradient look that reads as machine-made. */
+.backdrop-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Motion and heavy blur are the two things worth dropping for reduced-motion
+   and small screens respectively. */
+@media (prefers-reduced-motion: reduce) {
+  .backdrop-layer { transition: none; }
+}
+@media (max-width: 560px) {
+  /* A 38px blur over a full-bleed splash is the most expensive paint on the
+     page; ease off where the GPU is weakest and the art is barely visible. */
+  .backdrop-layer { filter: blur(5px) saturate(.75); }
+  .backdrop-layer.is-on { opacity: .8; }
+}
+
+/* Global roll counter (top right) */
+.roll-count {
+  position: fixed;
+  top: 12px; right: 14px;
+  z-index: 50;
   margin: 0;
+  padding: 6px 12px;
+  background: rgba(17, 24, 32, .82);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  backdrop-filter: blur(6px);
+  color: var(--text-dim);
+  font-size: .74rem;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  font-weight: 600;
+  pointer-events: none;
+}
+.roll-count strong {
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: .95rem;
+  letter-spacing: .03em;
+}
+.roll-count[hidden] { display: none; }
+@media (max-width: 560px) {
+  .roll-count { top: 8px; right: 8px; font-size: .66rem; padding: 5px 9px; }
+}
+
+/* Header — left-anchored to the content column rather than centred. */
+.site-header {
+  width: 100%;
+  max-width: 800px;
+  text-align: left;
+  margin: 44px 0 6px;
+}
+.logo {
+  margin: 0 0 0 -.04em; /* optical: Oswald's side bearing indents the L */
   font-family: var(--font-display);
   font-size: clamp(2.4rem, 7vw, 4rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .06em;
   color: var(--gold);
+  line-height: 1.02;
 }
-.tagline { margin: 4px 0 0; color: var(--text-dim); font-size: 1rem; }
+.tagline {
+  margin: 2px 0 0;
+  color: var(--text-dim);
+  font-size: 1.05rem;
+}
 .tagline em { color: var(--blue); font-style: normal; }
+
+@media (max-width: 560px) {
+  .site-header { margin-top: 28px; }
+}
 
 /* Tabs */
 .tabs {
   display: flex;
   gap: 6px;
-  margin: 28px 0 22px;
+  margin: 24px 0 22px;
   background: var(--bg-panel);
   padding: 6px;
   border-radius: var(--r);
   border: 1px solid var(--border);
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start; /* sits under the logo, not centred on the page */
+  width: 100%;
+  max-width: fit-content;
 }
 .tab {
   border: 0;
@@ -179,7 +290,7 @@ main { width: 100%; max-width: 800px; display: flex; flex-direction: column; ali
   letter-spacing: .06em;
   margin-bottom: 14px;
 }
-.why { margin: 16px 0 0; color: var(--text); font-size: 1.05rem; line-height: 1.5; max-width: 46ch; }
+.why { margin: 16px 0 0; color: var(--text); font-size: 1.05rem; line-height: 1.5;}
 
 /* Duo layout */
 .duo-row { display: flex; align-items: center; justify-content: center; gap: 18px; }
@@ -268,10 +379,9 @@ main { width: 100%; max-width: 800px; display: flex; flex-direction: column; ali
   margin: 0 0 10px;
 }
 .comp-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 14px 0 6px; }
-.comp-overview { color: var(--text); font-size: 1rem; line-height: 1.55; max-width: 52ch; margin: 10px 0 4px; }
+.comp-overview { color: var(--text); font-size: 1rem; line-height: 1.55; margin: 10px 0 4px; }
 .comp-section {
   width: 100%;
-  max-width: 52ch;
   text-align: left;
   margin-top: 16px;
   padding: 12px 16px;
@@ -494,6 +604,17 @@ main { width: 100%; max-width: 800px; display: flex; flex-direction: column; ali
 .result > .card { animation: pop .28s ease; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
 /* Footer */
+/* Signed, dated line at the end of the About — the human maintaining this. */
+.signoff {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: .88rem;
+  line-height: 1.6;
+}
+.signoff strong { color: var(--gold); font-weight: 700; }
+
 .site-footer { margin-top: 40px; text-align: center; color: var(--text-dim); font-size: .8rem; max-width: 540px; }
 .site-footer a { color: var(--gold); }
 .disclaimer { opacity: .7; margin-top: 6px; font-size: .74rem; }
@@ -614,7 +735,6 @@ main { width: 100%; max-width: 800px; display: flex; flex-direction: column; ali
 
 /* Intro line + crawlable About/FAQ content (SEO) */
 .intro {
-  max-width: 54ch;
   margin: 12px auto 0;
   color: var(--text-dim);
   font-size: .98rem;
